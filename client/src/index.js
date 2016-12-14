@@ -3,12 +3,14 @@ var Country = require('./bucketList/country.js');
 var BListView = require('./views/bucketList_view.js');
 
 window.onload = function() {
+    var bList = new BucketList();
+    var bListView = new BListView(bList);
 
     var remoteUrl = 'https://restcountries.eu/rest/v1/all';
 
-    makeRequest(remoteUrl, requestComplete);
+    bListView.makeRequest(remoteUrl, bListView.requestComplete);
 
-    var bList = new BucketList();
+    // this is the bit that gets the bucket list from mongodb
     var url = "http://localhost:3000/countries";
     var request = new XMLHttpRequest();
     request.open('GET', url);
@@ -19,46 +21,12 @@ window.onload = function() {
             for(country of bCountries) {
                 bList.addCountry(new Country(country));
             }
-            var bListView = new BListView(bList);
             bListView.bindEvents();
             bListView.render();
         }
     }
     request.send();
 }
-
-function makeRequest(url, callback) {
-    var request = new XMLHttpRequest();
-    request.open('GET', url);
-    request.onload = callback;
-    request.send();
-}
-
-function requestComplete() {
-    console.log("requestComplete");
-    if (this.status !== 200) return;
-    var jsonString = this.responseText;
-    var countries = JSON.parse(jsonString);
-    console.log(countries);
-    populateList(countries);
-}
-
-function populateList(countries) {
-    var select = document.getElementById('country-select');
-    // select.onchange = function() {
-    //     displayItems(countries[this.value]);
-    // }
-    for (var i = 0; i < countries.length; i++) {
-        var option = document.createElement('option');
-        option.innerText = countries[i].name;
-        option.value = i;
-        select.appendChild(option);
-    }
-}
-
-// function displayItems(country) {
-//     var pTag = 
-// }
 
 
 
